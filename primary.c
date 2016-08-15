@@ -1,6 +1,6 @@
 #include "src/include.h"
 #include "./ini_files/ini.h"	//For reading .ini file
-#include "./ini_files/ini.c" 
+#include "./ini_files/ini.c"
 
 //------------ For reading input parameters from .ini file--------
 typedef struct
@@ -79,7 +79,7 @@ static int handler(void* user, const char* section, const char* name,
 
 int main(int argc,char** argv)
 { 
-	struct relicparam paramrelic;	//Central Structure in code which contains all values  
+    struct relicparam paramrelic;	// Central Structure in code which contains all values
 	double ratioH[NNUC+1],sigma_ratioH[NNUC+1];
 	double H2_H,He3_H,Yp,Li7_H,Li6_H,Be7_H;
     double sigma_H2_H,sigma_He3_H,sigma_Yp,sigma_Li7_H,sigma_Li6_H,sigma_Be7_H;
@@ -90,10 +90,9 @@ int main(int argc,char** argv)
     const char *const reheating = "reheating";
     const char *const wimp = "wimp";
 
-    /* Type of run may be stated as an input argument. An empty argument will run
-     * the standard cosmology scenario with eta_10=6.10, tau=880.3 and Nnu=3.046. */
-    cosmo = 0;  // default cosmological parameters
-
+    /* The type of run may be stated as an input argument. An empty argument will run
+     * the default parameter-free SBBN with eta_10=6.10, tau=880.3 and Nnu=3.046. */
+    cosmo = 0;          // Default run
     if (argc==2)
     {
         sscanf(argv[1],"%s",&cosmoType);
@@ -114,7 +113,7 @@ int main(int argc,char** argv)
         exit(1);
     }
 
-    // Parsing the input file and stored in 'config' structure
+    // Parsing the input file, storing it in 'config' structure
     configuration config;
 
     if (ini_parse("./input.ini", handler, &config) < 0) {
@@ -125,19 +124,22 @@ int main(int argc,char** argv)
     // For initialization of all variables
     Init_cosmomodel(&paramrelic);
 
-    // Transferring all values into main program;
+    // If other than default SBBN scenario is chosen, initialize parameters as given through "input.ini".
     if (cosmo == 1)            // standard cosmology
     {
+        //printf("STANDARD\n");
         Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,config.xinu3,&paramrelic);
     }
     else if (cosmo == 2)       // dark density included
     {
+        //printf("DARKDENS\n");
         Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,config.xinu3,&paramrelic);
         Init_dark_density(config.dd0,config.ndd,config.Tdend,&paramrelic);
         Init_dark_entropy(config.sd0,config.nsd,config.Tsend,&paramrelic);
     }
     else if (cosmo == 3)      // reheating included
     {
+        //printf("REHEATING\n");
         Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,config.xinu3,&paramrelic);
         Init_dark_density(config.dd0,config.ndd,config.TSigmaend,&paramrelic);
         Init_dark_entropySigmaD(config.Sigmad0,config.nSigmad,config.TSigmaend,&paramrelic);
@@ -145,7 +147,7 @@ int main(int argc,char** argv)
     else if (cosmo == 4)           // WIMP included
     {
         double gchi, gchi_t;
-        int fermion, selfConjugate;
+        int fermion, selfConjugate; // 1/0 for fermion/boson, 1/0 for self-conjugate/non-self-conjugate
         if (config.type_wimp == 1) // Real scalar
         {
             gchi = 1.;
