@@ -49,6 +49,7 @@ typedef struct relicparam
     int SM_coupling_wimp;   // wimp coupling to SM particles. 1 for SM neutrino, 2 for EM, 3 for SM and equivalent neutrino
     int selfConjugate;  // True=1, False=0
     double phiW;
+    int vary_phiW;
     double Tinit;
 }
 relicparam;
