@@ -1,4 +1,4 @@
-//D... All functions and structures are initialized in this file
+// All functions and structures are initialized in this file
 
 #include <stdio.h>				
 #include <stdlib.h>
@@ -37,20 +37,22 @@ typedef struct relicparam
 	double Sigmad0,nSigmad,TSigmaend;
 	double nt0,nnt,Tnend;
 	double mgravitino;
-    double table_eff[276][3]; // Reads values from the SgStar files
-    double eta0;		// Initial Baryon to photon ratio
-    double Nnu;		// Number of Neutrinos (e+- included)
-    double dNnu;    // Number of extra neutrinos (delta N_nu)
+    double table_eff[276][3];   // Reads values from the SgStar files
+    double eta0;                // Initial Baryon to photon ratio
+    double Nnu;                 // Number of Neutrinos (e+- included)
+    double dNnu;                // Number of extra neutrinos (delta N_nu)
     double life_neutron;		// neutron lifetime
-    double xinu1,xinu2,xinu3;		/* ... [e-,neutrino]  [muon,neutrino], [tau,neutrino] respectively (degeneracy parameters) */
+    double xinu1,xinu2,xinu3;	// [e-,neutrino], [muon,neutrino], [tau,neutrino] respectively (degeneracy parameters)
     double mass_wimp, g_chi, g_chi_tilde;    // mass and internal degrees of freedom of wimp
-    int wimp_added;  // Switch to activate WIMP calculations
-    int beta;    // type of wimp, 1 if fermion, 0 if boson
-    int SM_coupling_wimp;   // wimp coupling to SM particles. 1 for SM neutrino, 2 for EM, 3 for SM and equivalent neutrino
-    int selfConjugate;  // True=1, False=0
-    double phiW;
+    int wimp_added;             // Switch to activate WIMP calculations
+    int beta;                   // type of wimp, 1/0 for fermion/boson
+    int SM_coupling_wimp;       // wimp coupling to SM particles. 1 for EM, 2 for neutrino, 3 for neut. and eq. neut.
+    int selfConjugate;          // 1/0 for self-conjugate/non-self-conjugate WIMP
+    double phiW;                // Parameterized WIMP chemical potential
+    double Tinit;               // Initial temperature
+    /* TO DO: Include a way to vary the chemical potential! */
     int vary_phiW;
-    double Tinit;
+
 }
 relicparam;
 

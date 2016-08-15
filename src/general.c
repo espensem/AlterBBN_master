@@ -1,4 +1,4 @@
-//D..... All the mathematical funcitons are contained in this file.
+// All the mathematical funcitons are contained in this file.
 
 #include "include.h"			// Poly di etc logarithmic funcitons and simple functions
 

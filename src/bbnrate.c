@@ -1,13 +1,14 @@
 #include "include.h"
 
 void rate_weak(int err, double f[])
-/* calculates the nuclear forward rates of weak interaction reactions */
+/* Calculates the nuclear forward rates of weak interaction reactions */
 /* err=0: central values; err=1: high values; err=2: low values; err>100000:
  * random gaussian error; err<0: error only for process number (-err) */
 {
 	double ferrlow[12],ferrhigh[12],ferr[12];
 	int ie;
 	
+    // Reactions involving weak interactions
 	f[2]=1.78141141239e-9;	/* H3 -> e- + v + He3 */		
 	f[3]=0.827;	 	/* Li8 -> e- + v + 2He4 */
 	f[4]=34.3;	 	/* B12 -> e- + B + C12 */
@@ -51,7 +52,7 @@ void rate_weak(int err, double f[])
 
 void rate_pn(int err, struct relicparam paramrelic, double f[], double r[],
              double T9, double Tnu)
-/* calculates the nuclear forward and reverse rates f[] and r[] of the reaction
+/* Calculates the nuclear forward and reverse rates f[] and r[] of the reaction
  * p <-> n at the temperature T9 */
 /*err=0: central values; err=1: high values; err=2: low values;
  * err>100000: random gaussian error; err<0: error only for process number
@@ -212,17 +213,6 @@ void rate_all(int err, double f[], double T9, struct relicparam paramrelic)
 /* err=0: central values; err=1: high values; err=2: low values; err>100000:
  * random gaussian error; err<0: error only for process number (-err) */
 {
-    int oldRates = 0;   // 0/1 - false/true
-    int oldRates12 = 0;
-    int oldRates19 = 0;
-    int oldRates20 = 0;
-    int oldRates27 = 0;
-    int oldRates28 = 0;
-    int oldRates29 = 0;
-    if (oldRates)
-    {
-        oldRates12 = oldRates19 = oldRates20 = oldRates27 = oldRates28 = oldRates29 = 1;
-    }
 	double ferrlow[NNUCREAC+1],ferrhigh[NNUCREAC+1],ferr[NNUCREAC+1];
 	int ie;
 
@@ -233,41 +223,7 @@ void rate_all(int err, double f[], double T9, struct relicparam paramrelic)
 		ferr[ie]=ferrhigh[ie];
 	}
 
-/* H + n -> g + H2 */ /* C.......H(n,g)H2................... */
-    // OLD RATE (Serpico et al 2004)
-if (oldRates12)
-{
-    if(T9<1.5)
-    {
-        f[12]=44060.*(1.-2.7503695564153143*T9-3.5220409333117897*T9*T9-0.2093513619089196*T9*T9*T9
-                      +0.10659679579058313*sqrt(T9)+4.62948586627009*pow(T9,3./2.)+1.3459574632779876*pow(T9,5./2.));
-    }
-	else
-    {
-        f[12]=(1.-sqrt(T9)*0.8504+T9*0.4895-pow(T9,3./2.)*0.09623+T9*0.008471*T9-T9*2.8e-4*pow(T9,3./2.))*47420.;
-    }
-
-	if((err!=0)&&(err!=-10000))
-	{
-        if(T9<1.5)
-        {
-            ferrlow[12]=-(67.95212182165885*
-                          sqrt(1.255364135304537+618.8966688079934*T9+21793.605102078516*T9*T9
-                               +97573.42092925594*T9*T9*T9+85539.62453206794*pow(T9,4.)+14687.125326371255*pow(T9,5.)
-                               +247.57751149254238*pow(T9,6.)-2855.9302137640752*pow(T9,11./2.)
-                               -25.82889427679147*pow(T9,1./2.)-5043.279674275595*pow(T9,3./2.)
-                               -57307.155278753264*pow(T9,5./2.)-111071.90152148822*pow(T9,7./2.)
-                               -44154.571125115704*pow(T9,9./2.))) / f[12];
-        }
-		else ferrlow[12]=-0.078;
-		
-		ferrhigh[12]=-ferrlow[12];
-		ferr[12]=ferrlow[12];
-	} 
-}
-else
-{
-    // NEW RATE (Ando et al. 2006)
+/* H + n -> g + H2 */   // Ando et al. 2006 (updated from Serpico et al. 2004)
     if(T9<=1.5)
     {
         f[12]=44216.*(1+3.75191*T9+1.92934*T9*T9+0.746503*T9*T9*T9+0.0197023*pow(T9,4.)+3.00491e-6*pow(T9,5.))/
@@ -290,9 +246,9 @@ else
         ferrhigh[12]=-ferrlow[12];
         ferr[12]=ferrlow[12];
     }
-}
+
 	
-/* H2 + n -> g + H3 */ /* C.......H2(n,g)H3..................(Wagoner 1969) */
+/* H2 + n -> g + H3 */      // Wagoner 1969
 	f[13]=(T9*18.9+1.)*66.2;
 	if((err!=0)&&(err!=-10000))
 	{
@@ -301,7 +257,7 @@ else
 		ferr[13]=ferrlow[13];
 	}
 	
-/* He3 + n -> g + He4 */ /* C.......He3(n,g)He4................(Wagoner 1969) */
+/* He3 + n -> g + He4 */    // Wagoner 1969
 	f[14]=(T9*905.+1.)*6.62;
 	if((err!=0)&&(err!=-10000))
 	{
@@ -310,7 +266,7 @@ else
 		ferr[14]=ferrlow[14];
 	}
 	
-/* Li6 + n -> g + Li7 */ /* C.......Li6(n,g)Li7................(Malaney-Fowler 1989) */
+/* Li6 + n -> g + Li7 */    // Malaney-Fowler 1989
 	f[15]=5100.;
 	if((err!=0)&&(err!=-10000))
 	{
@@ -319,7 +275,7 @@ else
 		ferr[15]=ferrlow[15];
 	}
 	
-/* He3 + n -> p + H3 */ /* C.......He3(n,p)H3.................(Serpico et al 2004) */
+/* He3 + n -> p + H3 */     // Serpico et al. 2004
     if(T9<2.5)
     {
         f[16]=7.064935e8+6.733213571736319e8*T9+1.7181155480346258e9*T9*T9-4.5367658146835446e8*T9*T9*T9
@@ -349,7 +305,7 @@ else
 		ferr[16]=ferrlow[16];
 	}
 	
-/* Be7 + n -> p + Li7 */ /* C.......Be7(n,p)Li7................(Serpico et al 2004) */
+/* Be7 + n -> p + Li7 */    // Serpico et al 2004
     if(T9<2.5)
     {
         f[17]=6.8423032e9+1.7674863e10*T9+2.6622006e9*T9*T9-3.3561608e8*T9*T9*T9-5.9309139e6*pow(T9,4.)
@@ -382,7 +338,7 @@ else
 	}
 	
 
-/* Li6 + n -> a + H3 */	/* C.......Li6(n,t)He4................(Caughlan-Fowler 1988) */
+/* Li6 + n -> a + H3 */     // Caughlan-Fowler 1988
     f[18]=pow(T9,-1.5)*2.54e9*exp(-2.39/T9)+(1.-pow(T9/(T9*49.18+1.),1.5)*0.261/pow(T9,1.5))*1.68e8;
 	if((err!=0)&&(err!=-10000))
 	{
@@ -392,23 +348,7 @@ else
 	}
 
 
-/* Be7 + n -> a + He4 */ /* C.......Be7(n,a)He4.......... */
-    // New rates are valid in the interval 0.1 <= T9 <= 5.0
-    // Using old values outside this interval
-if (oldRates19)
-{
-    // OLD RATE (Wagoner 1969)
-    f[19]=(T9*3760.+1.)*20500.;
-    if((err!=0)&&(err!=-10000))
-    {
-        ferrhigh[19]=0.9;
-        ferrlow[19]=-0.9;
-        ferr[19]=ferrlow[19];
-    }
-}
-else
-{
-    // NEW RATE (Hou et al. 2015)
+/* Be7 + n -> a + He4 */    // Hou et al. 2015 (updated from Wagoner 1969)
     if (T9<=10.)
     {
         f[19]=exp(-17.8984+0.2711/T9-23.8918*pow(T9,-1./3.)+62.2135*pow(T9,1./3.)-5.2888*T9
@@ -441,61 +381,20 @@ else
         else if ((T9>4.25)&&(T9<=4.75)) ferrhigh[19]=0.15;
         else if ((T9>4.75)&&(T9<=5.00)) ferrhigh[19]=0.14;
         else
-        {   // Old error outside valid T interval
+        {
             ferrhigh[19]=0.;
         }
         ferrlow[19]=-ferrhigh[19];
         ferr[19]=ferrlow[19];
 
     }
-}
 
-/* H2 + p -> g + He3 */	/* C.......H2(p,g)He3................. */
-    // New rates are valid in the interval 0.001 <= T9 <= 10.0
-    // Using old values outside this interval
-if (oldRates20)
-{
-    // OLD RATES (Serpico et al 2004)
 
-    if (T9<4.)
-    {
-        f[20]=((-15.709674-721.9142*T9+173.23945*T9*T9-77.371692*T9*T9*T9+126.82087e0*pow(T9,1./3.)
-                -206.50853*pow(T9,2./3.)+2120.7339*pow(T9,4./3.)-369.61306*pow(T9,5./3.)+127.8378*pow(T9,7./3.)
-                +100.68769*pow(T9,8./3.))*pow(T9,-2./3.))/exp(1.29042942e0*pow(T9,-1./3.));
-    }
-    else f[20]=2049.72;
-    if((err!=0)&&(err!=-10000))
-    {
-        if(T9<4.)
-        {
-            ferrhigh[20]=sqrt(0.02235*0.02235+1.2*pow((((-20.607762-651.42468*T9+690.01011*T9*T9-28.933696*T9*T9*T9
-                                                         +134.27673*pow(T9,1./3.)-148.86271*pow(T9,2./3.)
-                                                         +1513.5632*pow(T9,4./3.)-668.14865*pow(T9,5./3.)
-                                                         -11.831976*pow(T9,7./3.)-1.7647978*pow(T9,8./3.))*
-                                                        pow(T9,-2./3.))/exp(0.82258711*pow(T9,-1./3.)))/f[20]-1.,2.));
-            ferrlow[20]=-sqrt(0.02235*0.02235+1.2*pow((((-10.782957+32828.304*T9-65943.049*T9*T9+679.86033*T9*T9*T9
-                                                         +727.88161*pow(T9,1./3.)-7736.0309*pow(T9,2./3.)
-                                                         -64848.454*pow(T9,4./3.)+84983.958*pow(T9,5./3.)
-                                                         +30784.918*pow(T9,7./3.)-7555.1171*pow(T9,8./3.))*
-                                                        pow(T9,-2./3.))/exp(2.44792659*pow(T9,-1./3.)))/f[20]-1.,2.));
-        }
-        else
-        {
-            ferrhigh[20]=sqrt(0.02235*0.02235+1.2*pow(2104.68/f[20]-1.,2.));
-            ferrlow[20]=-sqrt(0.02235*0.02235+1.2*pow(1994.63/f[20]-1.,2.));
-        }
-        ferr[20]=ferrlow[20];
-    }
-}
-else
-{
-    // NEW RATES (A.Coc et al 2015)
-    // Use old rates outside valid T interval
+/* H2 + p -> g + He3 */     // Coc et al. 2015 (updated from Serpico et al. 2005)
     if (T9<0.001)
     {
         f[20]=4.815e-14;
     }
-    // Updated rates
     else if ((T9>=0.001)&&(T9<=0.0015)) f[20]=4.815e-14;
     else if ((T9>0.0015)&&(T9<=0.0025)) f[20]=6.409e-9;
     else if ((T9>0.0025)&&(T9<=0.0035)) f[20]=4.525e-7;
@@ -559,7 +458,7 @@ else
     else f[20]=0.;
 
     if((err!=0)&&(err!=-10000))
-    {   // Old errors outside valid T interval
+    {
         if (T9<0.001)
         {
             ferrhigh[20]=0.038;
@@ -572,7 +471,6 @@ else
         else if ((T9>7.5)&&(T9<=8.5)) ferrhigh[20]=0.046;
         else if ((T9>8.5)&&(T9<=9.5)) ferrhigh[20]=0.047;
         else if ((T9>9.5)&&(T9<=10.)) ferrhigh[20]=0.049;
-        // Old errors outside valid T interval
         else
         {
             ferrhigh[20]=0.;
@@ -580,9 +478,9 @@ else
         ferrlow[20]=1./(1+ferrhigh[20]) - 1.;
         ferr[20]=ferrlow[20];
     }
-}
 
-/* H3 + p -> g + He4 */ /* C.......H3(p,g)He4.................(Caughlan-Fowler 1988) */
+
+/* H3 + p -> g + He4 */     // Caughlan-Fowler 1988
     f[21]=pow(T9,-2./3.)*2.2e4*exp(-3.869/pow(T9,1./3.))*(pow(T9,1./3.)*0.108+1.+pow(T9,2./3.)*1.68+T9*1.26
                                                           +pow(T9,4./3.)*0.551+pow(T9,5./3.)*1.06);
 	if((err!=0)&&(err!=-10000))
@@ -593,7 +491,7 @@ else
 	}
 
 
-/* Li6 + p -> g + Be7 */ /* C.......Li6(p,g)Be7................(NACRE 1999) */
+/* Li6 + p -> g + Be7 */    // NACRE 1999
 	f[22] = 1.25e6*pow(T9,-2./3.)*exp(-8.415/pow(T9,1./3.))*(1.-0.252*T9+5.19e-2*T9*T9-2.92e-3*T9*T9*T9);
 	if((err!=0)&&(err!=-10000))
 	{
@@ -602,7 +500,7 @@ else
 		ferr[22]=ferrlow[22];
 	}
 
-/* Li6 + p -> a + He3 */ /* C.......Li6(p,He3)He4..............(Serpico et al 2004) */
+/* Li6 + p -> a + He3 */    // Serpico et al 2004
     if (T9<2.5)
     {
         f[23]=((-7.4966212e7-1.9411561e10*T9+1.6262854e10*T9*T9+2.0533495e7*pow(T9,1./3.)+3.9547491e9*pow(T9,2./3.)
@@ -635,7 +533,7 @@ else
 		ferr[23]=ferrlow[23];
 	}
 
-/* Li7 + p -> a + He4 */ /* C.......Li7(p,a)He4................(Serpico et al 2004) */
+/* Li7 + p -> a + He4 */    // Serpico et al 2004
 	if (T9<2.5)
 	{
         f[24]=((-8.9654123e7-2.5851582e8*T9-2.6831252e7*T9*T9+3.8691673e8*pow(T9,1./3.)+4.9721269e8*pow(T9,2./3.)
@@ -688,7 +586,7 @@ else
 		ferr[24]=ferrlow[24];
 	}
 
-/* H2 + a -> g + Li6 */ /* C.......He4(d,g)Li6................(NACRE 1999) */
+/* H2 + a -> g + Li6 */     // NACRE 1999
     f[25]=1.482e1*pow(T9,-2./3.)*exp(-7.435/pow(T9,1./3.))*(1.+6.572*T9+7.6e-2*T9*T9+2.48e-2*T9*T9*T9)
             +8.28e1*pow(T9,-3./2.)*exp(-7.904/T9);
 	if((err!=0)&&(err!=-10000))
@@ -698,7 +596,7 @@ else
 		ferr[25]=ferrlow[25];
 	}
 
-/* H3 + a -> g + Li7 */ /*C.......He4(t,g)Li7................(Serpico et al 2004) */
+/* H3 + a -> g + Li7 */     // Serpico et al 2004
     if (T9<2.5)
     {
         f[26]=((0.094614248-4.9273133*T9+99.358965*T9*T9-989.81236*T9*T9*T9+4368.45*pow(T9,4.)+931.93597*pow(T9,5.)
@@ -734,50 +632,7 @@ else
 		ferr[26]=ferrlow[26];
 	}
 
-/* He3 + a -> g + Be7 */ /* C.......He4(He3,g)Be7......... */
-if (oldRates27)
-{
-    // OLD RATES (Serpico et al 2004)
-
-    if(T9<2.5)
-    {
-        f[27]=((0.000046165644-0.00046036111*T9-0.021600946*T9*T9+0.069627779*T9*T9*T9+7.346612*pow(T9,4.)
-                -95.123199*pow(T9,5.)+391.13123*pow(T9,6.)-187.23717*pow(T9,7.)+86.111544*pow(T9,8.)
-                -21.630169*pow(T9,9.)+3.6006922*pow(T9,10.)-0.34322836*pow(T9,11.)+0.018106742*pow(T9,12.)
-                -0.00035681506*pow(T9,13.))*pow(T9,-1./2.))/(exp(0.48102949*T9)*pow(1.+1.17917554*T9,3.));
-    }
-	else f[27]=149.06;
-	if((err!=0)&&(err!=-10000))
-	{
-		if(T9<2.5)
-		{
-            ferrhigh[27]=sqrt(0.048*0.048+2.1*
-                              pow((((0.000050712746-0.00048202784*T9-0.023831596*T9*T9+0.056033679*T9*T9*T9
-                                     +8.408972*pow(T9,4.)-106.22688*pow(T9,5.)+434.78964*pow(T9,6.)
-                                     -238.48007*pow(T9,7.)+94.757251*pow(T9,8.)-23.705813*pow(T9,9.)
-                                     +3.8007127*pow(T9,10.)-0.37029512*pow(T9,11.)+0.019933598*pow(T9,12.)
-                                     -0.00045281691*pow(T9,13.))*pow(T9,-1./2.))/
-                                   (exp(0.2282385*T9)*pow(1.+1.31654256*T9,3.)))/f[27]-1.,2.));
-            ferrlow[27]=-sqrt(0.048*0.048+2.1*
-                              pow((((0.000049798665-0.00047801278*T9-0.023362423*T9*T9+0.061790614*T9*T9*T9
-                                     +8.0589558*pow(T9,4.)-102.19595*pow(T9,5.)+418.23687*pow(T9,6.)
-                                     -229.34858*pow(T9,7.)+92.638713*pow(T9,8.)-23.370595*pow(T9,9.)
-                                     +3.7644261*pow(T9,10.)-0.36726621*pow(T9,11.)+0.019784483*pow(T9,12.)
-                                     -0.00044951929*pow(T9,13.))*pow(T9,-1./2.))/
-                                   (exp(0.25325444*T9)*pow(1.+1.28569931*T9,3.)))/f[27]-1.,2.));
-		}
-		else
-		{
-			ferrhigh[27]=sqrt(0.048*0.048+2.1*pow(150.371/f[27]-1.,2.));
-			ferrlow[27]=-sqrt(0.048*0.048+2.1*pow(147.698/f[27]-1.,2.));
-		}
-		ferr[27]=ferrlow[27];
-	}
-}
-
-else
-{
-    // NEW RATES (Cyburt et al 2008)
+/* He3 + a -> g + Be7 */  // Cyburt et al. 2008 (updated from Serpico et al 2004)
     if (T9<=100.)
     {
         f[27]=exp(15.609867-(12.82707707/pow(T9,1./3.))-0.6666667*log(T9))*
@@ -801,62 +656,13 @@ else
         }
         ferr[27]=ferrlow[27];
     }
-}
 
-/* H2 + H2 -> n + He3 */ /*C.......H2(d,n)He3................. */
-    // New rates are valid in the interval 0.001 <= T9 <= 10.0
-    // Using old values outside this interval
-if (oldRates28)
-{
-    // OLD RATES (Pisanti et al 2007)
-    if(T9<4.)
-    {
-        f[28]=((-1.8436156e6 - 6.1150115e7*T9 - 2.7251853e7*T9*T9 - 2.2800422e6*T9*T9*T9 - 252433.58*pow(T9,4.)
-                - 284357.41*pow(T9,10./3.) + 906146.25*pow(T9,11./3.) + 1.2270083e7*pow(T9,1./3.)
-                - 1.3680884e7*pow(T9,2./3.) + 1.328894e8*pow(T9,4./3.) - 1.1916242e7*pow(T9,5./3.)
-                + 8.3705218e6*pow(T9,7./3.) + 2.2357751e6*pow(T9,8./3.))*pow(T9,-2./3.))/exp(1.*pow(T9,-1./3.));
-    }
-    else
-    {
-        f[28]=4.98099e7;
-    }
-    if((err!=0)&&(err!=-10000))
-    {
-        if(T9<4.)
-        {
-            ferrhigh[28]=sqrt(0.01*0.01+13.8*pow((((-1.7643388e6-6.0708618e7*T9-2.9398403e7*T9*T9
-                                                    -1.6035942e6*T9*T9*T9-188921.3*pow(T9,4.)
-                                                    -345931.36*pow(T9,10./3.)+684862.04*pow(T9,11./3.)
-                                                    +1.1654271e7*pow(T9,1./3.)-1.2269338e7*pow(T9,2./3.)
-                                                    +1.26615e8*pow(T9,4./3.)-3.5412041e6*pow(T9,5./3.)
-                                                    +6.1432859e6*pow(T9,7./3.)
-                                                    +2.8526453e6*pow(T9,8./3.))*pow(T9,-2./3.))/
-                                                  exp(pow(T9,-1./3.)))/f[28]-1.,2.));
-            ferrlow[28]=-sqrt(0.01*0.01+13.8*pow((((-1.7643388e6-6.0708618e7*T9-2.9398403e7*T9*T9-1.6035942e6*T9*T9*T9
-                                                    -188921.3*pow(T9,4.)-345931.36*pow(T9,10./3.)
-                                                    +684862.04*pow(T9,11./3.)+1.1654271e7*pow(T9,1./3.)
-                                                    -1.2269338e7*pow(T9,2./3.)+1.26615e8*pow(T9,4./3.)
-                                                    -3.5412041e6*pow(T9,5./3.)+6.1432859e6*pow(T9,7./3.)
-                                                    +2.8526453e6*pow(T9,8./3.))*pow(T9,-2./3.))/
-                                                  exp(pow(T9,-1./3.)))/f[28]-1.,2.));
-        }
-        else
-        {
-            ferrhigh[28]=sqrt(0.01*0.01+13.8*pow(4.99298e7/f[28]-1.,2.));
-            ferrlow[28]=-sqrt(0.01*0.01+13.8*pow(4.969e7/f[28]-1.,2.));
-        }
-        ferr[28]=ferrlow[28];
-    }
-}
-else
-{
-    // NEW RATES (A.Coc et al 2015)
-    // Use old rates outside valid T interval
+
+/* H2 + H2 -> n + He3 */    // Coc et al. 2015 (updated from Pisanti et al. 2007)
     if(T9<0.001)
     {
         f[28]=1.142e-8;
     }
-    // Updated rates
     else if ((T9>=0.001)&&(T9<=0.0015)) f[28]=1.142e-8;
     else if ((T9>0.0015)&&(T9<=0.0025)) f[28]=5.470e-5;
     else if ((T9>0.0025)&&(T9<=0.0035)) f[28]=3.021e-3;
@@ -920,7 +726,7 @@ else
     else f[28]=0.;
 
     if((err!=0)&&(err!=-10000))
-    {   // Old errors outside valid T interval
+    {
         if (T9<0.001)
         {
             ferrhigh[28]=0.011;
@@ -933,64 +739,21 @@ else
         else if ((T9>4.5)&&(T9<=5.5)) ferrhigh[28]=0.016;
         else if ((T9>5.5)&&(T9<=6.5)) ferrhigh[28]=0.017;
         else if ((T9>6.5)&&(T9<=10.)) ferrhigh[28]=0.018;
-        // Old errors outside valid T interval
         else
-        {   // T9 > 10
+        {
             ferrhigh[28]=0.;
         }
         ferrlow[28]=1./(1+ferrhigh[28]) - 1.;
         ferr[28]=ferrlow[28];
     }
-}
+
 
 	
-/* H2 + H2 -> p + H3 */ /* C.......H2(d,p)H3.................. */
-    // New rates are valid in the interval 0.001 <= T9 <= 10.0
-    // Using old values outside this interval
-if (oldRates29)
-{
-    // OLD RATES (Pisanti et al 2007)
-    if(T9<4.)
-    {
-        f[29]=((-5.8523126e6+2.3222535e8*T9-9.877862e6*T9*T9+5.2331507e7*pow(T9,1./3.)-1.7022642e8*pow(T9,2./3.)
-                -1.1875268e8*pow(T9,4./3.)+5.2922232e7*pow(T9,5./3.))*pow(T9,-2./3.))/exp(1.0676573*pow(T9,-1./3.));
-    }
-    else
-    {
-        f[29]=4.021e7;
-    }
-    if((err!=0)&&(err!=-10000))
-    {
-        if(T9<4.)
-        {
-            ferrhigh[29]=sqrt(0.01*0.01+12.3*pow((((-5.7455947e6+2.2299893e8*T9-9.5242666e6*T9*T9
-                                                    +5.1106128e7*pow(T9,1./3.)-1.651035e8*pow(T9,2./3.)
-                                                    -1.1215042e8*pow(T9,4./3.)
-                                                    +5.0522037e7*pow(T9,5./3.))*pow(T9,-2./3.))/
-                                                  exp(1.04599646*pow(T9,-1./3.)))/f[29]-1.,2.));
-            ferrlow[29]=-sqrt(0.01*0.01+12.3*pow((((-5.8975937e6+2.3572024e8*T9-1.0002957e7*T9*T9
-                                                    +5.2820931e7*pow(T9,1./3.)-1.7219803e8*pow(T9,2./3.)
-                                                    -1.2126621e8*pow(T9,4./3.)
-                                                    +5.3809211e7*pow(T9,5./3.))*pow(T9,-2./3.))/
-                                                  exp(1.07535853*pow(T9,-1./3.)))/f[29]-1.,2.));
-        }
-        else
-        {
-            ferrhigh[29]=sqrt(0.01*0.01+12.3*pow(4.02597e7/f[29]-1.,2.));
-            ferrlow[29]=-sqrt(0.01*0.01+12.3*pow(4.01609e7/f[29]-1.,2.));
-        }
-        ferr[29]=ferrlow[29];
-    }
-}
-else
-{
-    // NEW RATES (A.Coc et al 2015)
-    // Use old rates outside valid T interval
+/* H2 + H2 -> p + H3 */     // Coc et al. 2015 (updated from Pisanti et al. 2007)
     if(T9<0.001)
     {
         f[29]=1.173e-8;
     }
-    // Updated rates
     else if ((T9>=0.001)&&(T9<=0.0015)) f[29]=1.173e-8;
     else if ((T9>0.0015)&&(T9<=0.0025)) f[29]=5.609e-5;
     else if ((T9>0.0025)&&(T9<=0.0035)) f[29]=3.092e-3;
@@ -1054,7 +817,7 @@ else
     else f[29]=0.;
 
     if((err!=0)&&(err!=-10000))
-    {   // Old errors outside valid T interval
+    {
         if (T9<0.001)
         {
             ferrhigh[29]=0.011;
@@ -1068,7 +831,6 @@ else
         else if ((T9>4.5)&&(T9<=6.5)) ferrhigh[29]=0.017;
         else if ((T9>6.5)&&(T9<=9.5)) ferrhigh[29]=0.018;
         else if ((T9>9.5)&&(T9<=10.)) ferrhigh[29]=0.019;
-        // Old errors outside valid T interval
         else
         {
             ferrhigh[29]=0.;
@@ -1076,11 +838,12 @@ else
         ferrlow[29]=1./(1+ferrhigh[29]) - 1.;
         ferr[29]=ferrlow[29];
     }
-}
 
-/* H3 + H2 -> n + He4 */ /* C.......H3(d,n)He4.................(Serpico et al 2004) */
+
+/* H3 + H2 -> n + He4 */    // Serpico et al. 2004
     if(T9<2.5)
     {
+        // An error was found here! Changed from T9**2 to T9**3 in the factor 1.8764462e9*T9*T9*T9
         f[30]=6.2265733e8/(exp(0.49711597/T9)*pow(T9,0.56785403))
                 +exp(-0.23309803*T9*T9-1.342742*pow(T9,-1./3.))*(-8.1144927e7 + 2.2315324e9*T9-2.9439669e9*T9*T9
                                                                  +1.8764462e9*T9*T9*T9 - 6.0511612e8*pow(T9,4.)
@@ -1114,7 +877,7 @@ else
 		ferr[30]=ferrhigh[30];
 	}
 
-/* He3 + H2 -> p + He4 */ /* C.......He3(d,p)He4................(Serpico et al 2004) */
+/* He3 + H2 -> p + He4 */   // Serpico et al 2004
     if(T9<2.5)
     {
         f[31]=3.1038385e8/(exp(1.6190981/T9)*pow(T9,0.12159455))
@@ -1161,7 +924,7 @@ else
         ferr[31]=ferrlow[31];
     }
 
-/* He3 + He3 -> 2p + He4 */ /* C.......He3(He3,2p)He4.............(NACRE 1999) */
+/* He3 + He3 -> 2p + He4 */     // NACRE 1999
 	f[32]=5.59e10*pow(T9,-2./3.)*exp(-12.277/pow(T9,1./3.))*(1.-0.135*T9+2.54e-2*T9*T9 - 1.29e-3*T9*T9*T9);
 	if((err!=0)&&(err!=-10000))
 	{
@@ -1170,7 +933,7 @@ else
 		ferr[32]=ferrlow[32];
 	}
 
-/* Li7 + H2 -> n + a + He4 */ /* C.......Li7(d,na)He4...............(Serpico et al 2004) */
+/* Li7 + H2 -> n + a + He4 */   // Serpico et al. 2004
     if (T9<2.5)
     {
         f[33]=1.66e11*pow(T9,-2./3.)*exp(-10.254/pow(T9,1./3.))+1.71e6*pow(T9,-3./2.)*exp(-3.246/T9)
@@ -1185,7 +948,7 @@ else
 		ferr[33]=ferrlow[33];
 	}
 
-/* Be7 + H2 -> p + a + He4 */ /* C.......Be7(d,pa)He4...............(Caughlan-Fowler 1988) */
+/* Be7 + H2 -> p + a + He4 */   // Caughlan-Fowler 1988
 	f[34]=pow(T9,-2./3.)*1.07e12*exp(-12.428/pow(T9,1./3.));
 	if((err!=0)&&(err!=-10000))
 	{
@@ -1194,9 +957,9 @@ else
 		ferr[34]=ferrlow[34];
 	}
 
-/* ####################### NEW REACTIONS ####################### */
+/* ####################### NEW REACTIONS ####################### */     // Inspired by Parthenope
 
-/* He3 + H3 -> g + Li6 */ /* C.......He3(t,g)Li6................(Fukugita-Kajino 1990) */
+/* He3 + H3 -> g + Li6 */   // Fukugita-Kajino 1990
     f[35]=1.2201e6*pow(T9,-2./3.)*exp(-7.73436/pow(T9,1./3.))*(1.+5.38722e-2*pow(T9,1./3.)
                                                                -.214*(1.+.377*pow(T9,1./3.))*pow(T9,2./3.)
                                                                +.2733*(1.+.959*pow(T9,1./3.))*pow(T9,4./3.)
@@ -1211,7 +974,7 @@ else
     }
 
 
-/* Li6 + d -> n + Be7 */ /* C.......Li6(d,n)Be7................(Malaney-Fowler 1989) */
+/* Li6 + d -> n + Be7 */    // Malaney-Fowler 1989
     f[36]=1.48e12*pow(T9,-2./3.)*exp(-10.135/pow(T9,1./3.));
 
     if((err!=0)&&(err!=-10000))
@@ -1221,7 +984,7 @@ else
         ferr[36]=ferrlow[36];
     }
 
-/* Li6 + d -> n + Li7 */ /* C.......Li6(d,p)Li7................(Malaney-Fowler 1989) */
+/* Li6 + d -> n + Li7 */    // Malaney-Fowler 1989
     f[37]=1.48e12*pow(T9,-2./3.)*exp(-10.135/pow(T9,1./3.));
 
     if((err!=0)&&(err!=-10000))
@@ -1231,7 +994,7 @@ else
         ferr[37]=ferrlow[37];
     }
 
-/* He3 + H3 -> d + He4 */ /* C.......He3(t,d)He4................(Caughlan-Fowler 1988) */
+/* He3 + H3 -> d + He4 */   // Caughlan-Fowler 1988
     f[38]=5.46e9*pow(T9/(1.+.128*T9),.8333333)*pow(T9,-3./2.)*exp(-7.733/(pow(T9/(1.+.128*T9),.333333)));
 
     if((err!=0)&&(err!=-10000))
@@ -1241,7 +1004,7 @@ else
         ferr[38]=ferrlow[38];
     }
 
-/* H3 + H3 -> 2n + He4 */ /* C.......H3(t,2n)He4................(Caughlan-Fowler 1988) */
+/* H3 + H3 -> 2n + He4 */   // Caughlan-Fowler 1988
     f[39]=1.67e9*pow(T9,-2./3.)*exp(-4.872/pow(T9,1./3.))*(1.+8.6e-2*pow(T9,1./3.)-.455*pow(T9,2./3.)-.272*T9
                                                            +.148*pow(T9,4./3.)+.225*pow(T9,5./3.));
 
@@ -1252,7 +1015,7 @@ else
         ferr[39]=ferrlow[39];
     }
 
-/* He3 + H3 -> n + p + He4 */ /* C.......He3(t,np)He4...............(Caughlan-Fowler 1988) */
+/* He3 + H3 -> n + p + He4 */   // Caughlan-Fowler 1988
     f[40]=7.71e9*pow(T9/(1.+.115*T9),.8333333)*pow(T9,-3./2.)*exp(-7.733/(pow(T9/(1.+.115*T9),.333333)));
 
     if((err!=0)&&(err!=-10000))
@@ -1263,7 +1026,7 @@ else
     }
 
 
-/* Li7 + H3 -> n + Be9 */ /* C.......Li7(t,n)Be9................(Thomas 1993 from BKKW91) */
+/* Li7 + H3 -> n + Be9 */   // Thomas 1993 from BKKW91
     if (T9 < 10.0)
     {
         f[41]=2.98e10*pow(T9,-2./3.)*exp(-11.333/pow(T9,1./3.))*(1.-.122*pow(T9,2./3.)
@@ -1278,7 +1041,7 @@ else
         ferr[41]=ferrlow[41];
     }
 
-/* Be7 + H3 -> p + Be9 */ /* C.......Be7(t,p)Be9................(Serpico et al 2004) */
+/* Be7 + H3 -> p + Be9 */      // Serpico et al. 2004
     if (T9 < 10.0)
     {
         f[42]=1.1*2.98e10*pow(T9,-2./3.)*exp(-13.7307/pow(T9,1./3.))*(1.-.122*pow(T9,2./3.)
@@ -1293,7 +1056,7 @@ else
         ferr[42]=ferrlow[42];
     }
 
-/* Li7 + He3 -> p + Be9 */ /* C.......Li7(He3,p)Be9..............(Serpico et al 2004) */
+/* Li7 + He3 -> p + Be9 */      // Serpico et al. 2004
     if (T9 < 10.0)
     {
         f[43]=1.6*2.98e10*pow(T9,-2./3.)*exp(-17.992/pow(T9,1./3.))*(1.-.122*pow(T9,2./3.)
@@ -1309,7 +1072,8 @@ else
     }
 
 /* ############################################################# */
-/* Li7 + n -> g + Li8 */ /* C.......Li7(n,g)Li8................(Wagoner 1969) */
+
+/* Li7 + n -> g + Li8 */    // Wagoner 1969
     f[44]=3.144e3+4.26e3*pow(T9,-3./2.)*exp(-2.576/T9);
 	if((err!=0)&&(err!=-10000))
 	{
@@ -1318,16 +1082,16 @@ else
         ferr[44]=ferrlow[44];
 	}
 
-/* B10 + n -> g + B11 */ /* C.......B10(n,g)B11................(Wagoner 1969) */
+/* B10 + n -> g + B11 */    // Wagoner 1969
     f[45]=66200.;
 
-/* B11 + n -> g + B12 */ /* C.......B11(n,g)B12................(Malaney-Fowler 1989) */
+/* B11 + n -> g + B12 */    // Malaney-Fowler 1989
     f[46]=pow(T9,-1.5)*2400.*exp(-0.223/T9)+729.;
 
-/* C11 + n -> p + B11 */ /* C.......C11(n,p)B11................(Caughlan-Fowler 1988) */
+/* C11 + n -> p + B11 */    // Caughlan-Fowler 1988
     f[47]=(1.-sqrt(T9)*0.048+T9*0.01)*1.69e8;
 
-/* B10 + n -> a + Li7 */ /* C.......B10(n,a)Li7................(NACRE 1999) */
+/* B10 + n -> a + Li7 */    // NACRE 1999
     f[48]=2.2e7*(1.+1.064*T9);
 	if((err!=0)&&(err!=-10000))
 	{
@@ -1336,7 +1100,7 @@ else
         ferr[48]=ferrlow[48];
 	}
 	
-/* Be7 + p -> g + B8 */ /* C.......Be7(p,g)B8.................(NACRE 1999) */
+/* Be7 + p -> g + B8 */     // NACRE 1999
     f[49]=2.61e5*pow(T9,-2./3.)*exp(-10.264/pow(T9,1./3.))*(1.-5.11e-2*T9+ 4.68e-2*T9*T9-6.6e-3*T9*T9*T9
                                                             +3.12e-4*T9*T9*T9*T9)+ 2.05e3*pow(T9,-3./2.)*exp(-7.345/T9);
 	if((err!=0)&&(err!=-10000))
@@ -1346,31 +1110,31 @@ else
         ferr[49]=ferrlow[49];
 	}
 
-/* Be9 + p -> g + B10 */ /* C.......Be9(p,g)B10................(Caughlan-Fowler 1988) */
+/* Be9 + p -> g + B10 */    // Caughlan-Fowler 1988
     f[50]=pow(T9,-2./3.)*1.33e7*exp(-10.359/pow(T9,1./3.)-T9/0.846*T9/0.846)*(pow(T9,1./3.)*0.04+1.+pow(T9,2./3.)*1.52
                                                                               +T9*0.428+pow(T9,4./3.)*2.15
                                                                               +pow(T9,5./3.)*1.54)
             +pow(T9,-1.5)*96400.*exp(-3.445/T9)+pow(T9,-1.5)*2.72e6*exp(-10.62/T9);
 
-/* B10 + p -> g + C11 */ /* C.......B10(p,g)C11................(NACRE 1999) */
+/* B10 + p -> g + C11 */    // NACRE 1999
     f[51]=pow(T9,-2./3.)*1.68e6*exp(-pow(T9,-1./3.)*12.064)/
             (pow(pow(T9,2./3.)-0.0273,2.)+4.69e-4)*(1.+0.977*T9+1.87*T9*T9-0.272*T9*T9*T9+0.013*T9*T9*T9*T9);
 
-/* B11 + p -> g + C12 */ /* C.......B11(p,g)C12................(NACRE 1999) */
+/* B11 + p -> g + C12 */    // NACRE 1999
     f[52]=pow(T9,-2./3.)*4.58e7*exp(-pow(T9,-1./3.)*12.097-pow(T9/0.6,2.))*(1.+0.353*T9-0.842*T9*T9)
             +pow(T9,-3./2.)*6.82e3*exp(-1.738/T9)+2.8e4*pow(T9,0.104)*exp(-3.892/T9);
 	
-/* C11 + p -> g + N12 */ /* C.......C11(p,g)N12................(Caughlan-Fowler 1988) */
+/* C11 + p -> g + N12 */    // Caughlan-Fowler 1988
     f[53]=pow(T9,-2./3.)*42400.*exp(-13.658/pow(T9,1./3.)-T9/1.627*T9/1.627)*(pow(T9,1./3.)*0.031+1.
                                                                               +pow(T9,2./3.)*3.11+T9*0.665
                                                                               +pow(T9,4./3.)*4.61+pow(T9,5./3.)*2.5)
             +pow(T9,-1.5)*8840.*exp(-7.021/T9);
 	
-/* B12 + p -> n + C12 */ /* C.......B12(p,n)C12................(Wagoner 1969) */
+/* B12 + p -> n + C12 */    // Wagoner 1969
     f[54]=pow(T9,-2./3.)*4.02e11*exp(-12.12/pow(T9,1./3.));
     ferr[54]=0.3;
 	
-/* Be9 + p -> a + Li6 */ /* C.......Be9(p,a)Li6................(NACRE 1999) */
+/* Be9 + p -> a + Li6 */    // NACRE 1999
     /* C	Fit valid for T9>=.002 (T>=.17keV) */
     f[55]=2.11e11*pow(T9,-2./3.)*exp(-10.361/pow(T9,1./3.)-pow(T9/0.4,2.))*(1.-0.189*T9+3.52e1*T9*T9)
             +5.24e8*pow(T9,-3./2.)*exp(-3.446/T9)+4.65e8*exp(-4.396/T9)/(pow(T9,0.293));
@@ -1381,7 +1145,7 @@ else
         ferr[55]=ferrlow[55];
 	}
 
-/* B10 + p -> a + Be7 */ /* C.......B10(p,a)Be7................(NACRE 1999) */
+/* B10 + p -> a + Be7 */    // NACRE 1999
     if(T9>0.8)
     {
         f[56]=1.01e10*pow(T9,-2./3.)*exp(-12.064/pow(T9,1./3.))*(-1.+15.8*T9-2.6*T9*T9+0.125*T9*T9*T9);
@@ -1400,11 +1164,11 @@ else
         ferr[56]=ferrlow[56];
 	}
 
-/* B12 + p -> a + Be9 */ /* C.......B12(p,a)Be9................(Wagoner 1969) */
+/* B12 + p -> a + Be9 */    // Wagoner 1969
     f[57]=pow(T9,-2./3.)*2.01e11*exp(-12.12/pow(T9,1./3.));
     ferr[57]=0.3;
 	
-/* Li6 + a -> g + B10 */ /* C.......Li6(a,g)B10................(Caughlan-Fowler 1988) */
+/* Li6 + a -> g + B10 */    // Caughlan-Fowler 1988
     f[58]=pow(T9,-2./3.)*4.06e6*exp(-18.79/pow(T9,1./3.)-T9/1.326*T9/1.326)*(pow(T9,1./3.)*0.022+1.+pow(T9,2./3.)*1.54
                                                                              +T9*0.239+pow(T9,4./3.)*2.2
                                                                              +pow(T9,5./3.)*0.869)
@@ -1416,7 +1180,7 @@ else
         ferr[58]=ferrlow[58];
 	}
 
-/* Li7 + a -> g + B11 */ /* C.......Li7(a,g)B11................(NACRE 1999) */
+/* Li7 + a -> g + B11 */    // NACRE 1999
     if(T9>1.21)
     {
         f[59]=1.187e3*pow(T9,-3./2.)*exp(-2.959/T9)+7.945e3*(1.+0.1466*T9-1.273e-2*T9*T9)*exp(-4.922/T9)/
@@ -1434,7 +1198,7 @@ else
         ferr[59]=ferrlow[59];
 	}
 
-/* Be7 + a -> g + C11 */ /* C.......Be7(a,g)C11................(NACRE 1999) */
+/* Be7 + a -> g + C11 */    // NACRE 1999
     if (T9>2.)
     {
         f[60] = 1.41e3*exp(-3.015/T9)*pow(T9,0.636);
@@ -1452,117 +1216,117 @@ else
         ferr[60]=ferrlow[60];
 	}
 	
-/* B8 + a -> p + C11 */ /* C.......B8(a,p)C11.................(Wagoner 1969) */
+/* B8 + a -> p + C11 */     // Wagoner 1969
     f[61]=pow(T9,-2./3.)*1.08e15*exp(-27.36/pow(T9,1./3.));
 	
-/* Li8 + a -> n + B11 */ /* C.......Li8(a,n)B11................(Malaney-Fowler 1989) */
+/* Li8 + a -> n + B11 */    // Malaney-Fowler 1989
     f[62]=pow(T9/(T9/15.1+1.),5./6.)*8.62e13*pow(T9,-1.5)*exp(-19.461/pow(T9/(T9/15.1+1.),1./3.));
 	
-/* Be9 + a -> n + C12 */ /* C.......Be9(a,n)C12................(Caughlan-Fowler 1988) */
+/* Be9 + a -> n + C12 */    // Caughlan-Fowler 1988
     f[63]=pow(T9,-2./3.)*4.62e13*exp(-23.87/pow(T9,1./3.)-T9/0.049*T9/0.049)*(pow(T9,1./3.)*0.017+1.
                                                                               +pow(T9,2./3.)*8.57+T9*1.05
                                                                               +pow(T9,4./3.)*74.51+pow(T9,5./3.)*23.15)
             +pow(T9,-1.5)*7.34e-5*exp(-1.184/T9)+pow(T9,-1.5)*0.227*exp(-1.834/T9)
             +pow(T9,-1.5)*1.26e5*exp(-4.179/T9)+exp(-12.732/T9)*2.4e8;
 
-/* Be9 + H2 -> n + B10 */ /* C.......Be9(d,n)B10................(original Wagoner code) */
+/* Be9 + H2 -> n + B10 */   // original Wagoner code
     f[64]=pow(T9,-2./3.)*7.16e8*exp(6.44-12.6/pow(T9,1./3.));
 	
-/* B10 + H2 -> p + B11 */ /* C.......B10(d,p)B11................(original Wagoner code) */
+/* B10 + H2 -> p + B11 */   // original Wagoner code
     f[65]=pow(T9,-2./3.)*9.53e8*exp(7.3-14.8/pow(T9,1./3.));
 
-/* B11 + H2 -> n + C12 */ /* C.......B11(d,n)C12................(original Wagoner code) */
+/* B11 + H2 -> n + C12 */   // original Wagoner code
     f[66]=pow(T9,-2./3.)*1.41e9*exp(7.4-14.8/pow(T9,1./3.));
 
-/* He4 + a + n -> g + Be9 */ /* C.......He4(an,g)Be9...............(Caughlan-Fowler 1988) */
+/* He4 + a + n -> g + Be9 */    // Caughlan-Fowler 1988
     f[67]=2.59e-6/((T9*0.344+1.)*(T9*T9))*exp(-1.062/T9);
 	
-/* He4 + 2a -> g + C12 */ /* C.......He4(2a,g)C12...............(Caughlan-Fowler 1988) */
+/* He4 + 2a -> g + C12 */   // Caughlan-Fowler 1988
     f[68]=pow(T9,-1.5)*2.79e-8*pow(T9,-1.5)*exp(-4.4027/T9)+pow(T9,-1.5)*1.35e-8*exp(-24.811/T9);
 	
-/* Li8 + p -> n + a + He4 */ /* C.......Li8(p,na)He4...............(original Wagoner code) */
+/* Li8 + p -> n + a + He4 */    // original Wagoner code
     f[69]=pow(T9,-2./3.)*8.65e9*exp(-8.52/pow(T9,1./3.)-T9/2.53*T9/2.53)+pow(T9,-1.5)*2.31e9*exp(-4.64/T9);
 	
-/* B8 + n -> p + a + He4 */ /* C.......B8(n,pa)He4................(original Wagoner code) */
+/* B8 + n -> p + a + He4 */     // original Wagoner code
     f[70]=4.02e8;
 	
-/* Be9 + p -> d + a + He4 */ /* C.......Be9(p,da)He4...............(Caughlan-Fowler 1988) */
+/* Be9 + p -> d + a + He4 */    // Caughlan-Fowler 1988
     f[71]=pow(T9,-2./3.)*2.11e11*exp(-10.359/pow(T9,1./3.)-T9/0.52*T9/0.52)*(pow(T9,1./3.)*0.04+1.
                                                                              +pow(T9,2./3.)*1.09+T9*0.307
                                                                              +pow(T9,4./3.)*3.21+pow(T9,5./3.)*2.3)
             +5.79e8/T9*exp(-3.046/T9)+pow(T9,-0.75)*8.5e8*exp(-5.8/T9);
 	
-/* B11 + p -> 2a + He4 */ /* C.......B11(p,2a)He4...............(Caughlan-Fowler 1988) */
+/* B11 + p -> 2a + He4 */   // Caughlan-Fowler 1988
     f[72]=pow(T9,-2./3.)*2.2e12*exp(-12.095/pow(T9,1./3.)-T9/1.644*T9/1.644)*(pow(T9,1./3.)*0.034+1.
                                                                               +pow(T9,2./3.)*0.14+T9*0.034
                                                                               +pow(T9,4./3.)*0.19+pow(T9,5./3.)*0.116)
             +pow(T9,-1.5)*4.03e6*exp(-1.734/T9)+pow(T9,-1.5)*6.73e9*exp(-6.262/T9)+3.88e9/T9*exp(-14.154/T9);
 
-/* C11 + n -> 2a + He4 */ /* C.......C11(n,2a)He4...............(Wagoner 1969) */
+/* C11 + n -> 2a + He4 */   // Wagoner 1969
     f[73]=1.58e8;
 
-/* C12 + n -> g + C13 */ /* C.......C12(n,g)C13................(Wagoner 1969) */
+/* C12 + n -> g + C13 */    // Wagoner 1969
     f[74]=450.;
 
-/* C13 + n -> g + C14 */ /* C.......C13(n,g)C14................(Wagoner 1969) */
+/* C13 + n -> g + C14 */    // Wagoner 1969
     f[75]=pow(T9,-1.5)*2.38e5*exp(-1.67/T9)+119.;
 
-/* N14 + n -> g + N15 */ /* C.......N14(n,g)N15................(Wagoner 1969) */
+/* N14 + n -> g + N15 */    // Wagoner 1969
     f[76]=9940.;
 
-/* N13 + n -> p + C13 */ /* C.......N13(n,p)C13................(NACRE 1999) */
+/* N13 + n -> p + C13 */    // NACRE 1999
     f[77]= 1.178e8*(1.+3.36e-1*T9-3.792e-2*T9*T9+2.02e-3*T9*T9*T9);
     // Contribution from thermal excited levels (NACRE 1999)
     f[77]*=(1.+1.131*exp(-1.2892e1/T9+1.9e-2*T9));
     ferr[77]=0.3;
 
-/* N14 + n -> p + C14 */ /* C.......N14(n,p)C14................(Caughlan-Fowler 1988) */
+/* N14 + n -> p + C14 */    // Caughlan-Fowler 1988
     f[78]=(sqrt(T9)*0.361+1.+T9*0.502)*2.39e5+1.112e8/sqrt(T9)*exp(-4.983/T9);
 
-/* O15 + n -> p + N15 */ /* C.......O15(n,p)N15................(NACRE 1999) */
+/* O15 + n -> p + N15 */    // NACRE 1999
     f[79] = 1.158e8*(1.+2.19e-1*T9-2.9e-2*T9*T9+1.73e-3*T9*T9*T9);
     // Contribution from thermal excited levels (NACRE 1999)
     f[79]*=(1.+3.87e-1*exp(-26.171/T9+1.18e-1*T9));
 
-/* O15 + n -> a + C12 */ /* C.......O15(n,a)C12................(Caughlan-Fowler 1988) */
+/* O15 + n -> a + C12 */    // Caughlan-Fowler 1988
     f[80]=(sqrt(T9)*0.188+1.+T9*0.015)*3.5e7;
 	
-/* C12 + p -> g + N13 */ /* C.......C12(p,g)N13................(NACRE 1999) */
+/* C12 + p -> g + N13 */    // NACRE 1999
     f[81]=2.e7*pow(T9,-2./3.)*exp(-13.692*pow(T9,-1./3.)-pow(T9/0.46,2.))*(1.+9.89*T9-59.8*T9*T9+266.*T9*T9*T9)
             +1.e5*pow(T9,-3./2.)*exp(-4.913/T9)+4.24e5*pow(T9,-3./2.)*exp(-21.62/T9);
 	
-/* C13 + p -> g + N14 */ /* C.......C13(p,g)N14................(NACRE 1999) */
+/* C13 + p -> g + N14 */    // NACRE 1999
     f[82]=9.57e7*pow(T9,-2./3.)*exp(-13.720*pow(T9,-1./3.)-T9*T9)*(1.+3.56*T9)+1.5e6*pow(T9,-3./2.)*exp(-5.930/T9)
             +6.83e5*pow(T9,-8.64e-1)*exp(-12.057/T9);
     // Contribution from thermal excited levels (NACRE 1999)
-    f[82]*=(1.-2.07*exp(-37.938/T9));                                                         //E.. Found an error here. Was f[72] instead of f[73] (old numbering)
+    f[82]*=(1.-2.07*exp(-37.938/T9));
 	
-/* C14 + p -> g + N15 */ /* C.......C14(p,g)N15................(Caughlan-Fowler 1988) */
+/* C14 + p -> g + N15 */    // Caughlan-Fowler 1988
     f[83]=pow(T9,-2./3.)*6.8e6*exp(-13.741/pow(T9,1./3.)-T9/5.721*T9/5.721)*(pow(T9,1./3.)*0.03+1.+pow(T9,2./3.)*0.503
                                                                              +T9*0.107+pow(T9,4./3.)*0.213
                                                                              +pow(T9,5./3.)*0.115)
             +pow(T9,-1.5)*5360.*exp(-3.811/T9)+pow(T9,-1./3.)*98200.*exp(-4.739/T9);
 	
-/* N13 + p -> g + O14 */ /* C.......N13(p,g)O14................(Caughlan-Fowler 1988) */
+/* N13 + p -> g + O14 */    // Caughlan-Fowler 1988
     f[84]=pow(T9,-2./3.)*4.04e7*exp(-15.202/pow(T9,1./3.)-T9/1.191*T9/1.191)*(pow(T9,1./3.)*0.027+1.
                                                                               -pow(T9,2./3.)*0.803-T9*0.154
                                                                               +pow(T9,4./3.)*5.+pow(T9,5./3.)*2.44)
             +pow(T9,-1.5)*2.43e5*exp(-6.348/T9);
 	
-/* N14 + p -> g + O15 */ /* C.......N14(p,g)O15................(Caughlan-Fowler 1988) */
+/* N14 + p -> g + O15 */    // Caughlan-Fowler 1988
     f[85]=pow(T9,-2./3.)*4.9e7*exp(-15.228/pow(T9,1./3.)-T9/3.294*T9/3.294)*(pow(T9,1./3.)*0.027+1.
                                                                              -pow(T9,2./3.)*0.778
                                                                              -T9*0.149+pow(T9,4./3.)*0.261
                                                                              +pow(T9,5./3.)*0.127)
             +pow(T9,-1.5)*2370.*exp(-3.011/T9)+exp(-12.53/T9)*21900.;
 	
-/* N15 + p -> g + O16 */ /* C.......N15(p,g)O16................(Caughlan-Fowler 1988) */
+/* N15 + p -> g + O16 */    // Caughlan-Fowler 1988
     f[86]=pow(T9,-2./3.)*9.78e8*exp(-15.251/pow(T9,1./3.)-T9/0.45*T9/0.45)*(pow(T9,1./3.)*0.027+1.+pow(T9,2./3.)*0.219
                                                                             +T9*0.042+pow(T9,4./3.)*6.83
                                                                             +pow(T9,5./3.)*3.32)
             +pow(T9,-1.5)*11100.*exp(-3.328/T9)+pow(T9,-1.5)*14900.*exp(-4.665/T9)+pow(T9,-1.5)*3.8e6*exp(-11.048/T9);
 	
-/* N15 + p -> a + C12 */ /* C.......N15(p,a)C12................(NACRE 1999) */
+/* N15 + p -> a + C12 */    // NACRE 1999
     if (T9>2.5)
     {
         f[87]= 4.17e7*pow(T9,0.917)*exp(-3.292/T9);
@@ -1573,47 +1337,47 @@ else
                 +1.01e8*pow(T9,-3./2.)*exp(-3.643/T9)+1.19e9*pow(T9,-3./2.)*exp(-7.406/T9);
     }
 
-/* C12 + a -> g + O16 */ /* C.......C12(a,g)O16................(Caughlan-Fowler 1988) */
+/* C12 + a -> g + O16 */    // Caughlan-Fowler 1988
     f[88]=1.04e8/(T9*T9)*exp(-32.12/pow(T9,1./3.)-T9/3.496*T9/3.496)/pow(pow(T9,-2./3.)*0.0489+1.,2.)
             +1.76e8/(T9*T9)/pow(pow(T9,-2./3.)*0.2654+1.,2.)*exp(-32.12/pow(T9,1./3.))
             +pow(T9,-1.5)*1250.*exp(-27.499/T9)+pow(T9,5.)*0.0143*exp(-15.541/T9);
 	
-/* B10 + a -> p + C13 */ /* C.......B10(a,p)C13................(Wagoner 1969) */
+/* B10 + a -> p + C13 */    // Wagoner 1969
     f[89]=pow(T9,-2./3.)*9.6e14*exp(-27.99/pow(T9,1./3.));
 	
-/* B11 + a -> p + C14 */ /* C.......B11(a,p)C14................(Caughlan-Fowler 1988) */
+/* B11 + a -> p + C14 */    // Caughlan-Fowler 1988
     f[90]=pow(T9,-2./3.)*5.37e11*exp(-28.234/pow(T9,1./3.)-T9/0.347*T9/0.347)*(pow(T9,1./3.)*0.015+1.
                                                                                +pow(T9,2./3.)*5.575+T9*0.576
                                                                                +pow(T9,4./3.)*15.888
                                                                                +pow(T9,5./3.)*4.174)
             +pow(T9,-1.5)*0.00544*exp(-2.827/T9)+pow(T9,-1.5)*336.*exp(-5.178/T9)+5.32e6/pow(T9,0.375)*exp(-11.617/T9);
 	
-/* C11 + a -> p + N14 */ /* C.......C11(a,p)N14................(Caughlan-Fowler 1988) */
+/* C11 + a -> p + N14 */    // Caughlan-Fowler 1988
     f[91]=pow(T9/(T9*0.0478+1.+pow(T9,5./3.)*0.00756/pow(T9*0.0478+1.,2./3.)),5./6.)*
             7.15e15*pow(T9,-1.5)*exp(-31.883/pow(T9/(T9*0.0478+1.+pow(T9,5./3.)*0.00756/pow(T9*0.0478+1.,2./3.)),1./3.));
     // Contribution from thermal excited levels (NACRE 1999)
     f[91]*= (1.+0.140*exp(-0.275/T9-0.210*T9));
 
-/* N12 + a -> p + O15 */ /* C.......N12(a,p)O15................(Caughlan-Fowler 1988) */
+/* N12 + a -> p + O15 */    // Caughlan-Fowler 1988
     f[92]=pow(T9,-2./3.)*5.59e16*exp(-35.6/pow(T9,1./3.));
 	
-/* N13 + a -> p + O16 */ /* C.......N13(a,p)O16................(Caughlan-Fowler 1988) */
+/* N13 + a -> p + O16 */    // Caughlan-Fowler 1988
     f[93]=pow(T9/(T9*0.0776+1.+pow(T9,5./3.)*0.0264/pow(T9*0.0776+1.,2./3.)),5./6.)
             *3.23e17*pow(T9,-1.5)*exp(-35.829/pow(T9/(T9*0.0776+1.+pow(T9,5./3.)*0.0264/pow(T9*0.0776+1.,2./3.)),1./3.));
 	
-/* B10 + a -> n + N13 */ /* C.......B10(a,n)N13................(Caughlan-Fowler 1988) */
+/* B10 + a -> n + N13 */    // Caughlan-Fowler 1988
     f[94]=pow(T9,-2./3.)*1.2e13*exp(-27.989/pow(T9,1./3.)-T9/9.589*T9/9.589);
 
-/* B11 + a -> n + N14 */ /* C.......B11(a,n)N14................(Caughlan-Fowler 1988) */
+/* B11 + a -> n + N14 */    // Caughlan-Fowler 1988
     f[95]=pow(T9,-2./3.)*6.97e12*exp(-28.234/pow(T9,1./3.)-T9/0.14*T9/0.14)*(pow(T9,1./3.)*0.015+1.+pow(T9,2./3.)*8.115
                                                                              +T9*0.838+pow(T9,4./3.)*39.804
                                                                              +pow(T9,5./3.)*10.456)
             +pow(T9,-1.5)*1.79*exp(-2.827/T9)+pow(T9,-1.5)*1710.*exp(-5.178/T9)+pow(T9,0.6)*4.49e6*exp(-8.596/T9);
 
-/* B12 + a -> n + N15 */ /* C.......B12(a,n)N15................(Wagoner 1969) */
+/* B12 + a -> n + N15 */    // Wagoner 1969
     f[96]=pow(T9,-2./3.)*3.04e15*exp(-28.45/pow(T9,1./3.));
 
-/* C13 + a -> n + O16 */ /* C.......C13(a,n)O16................(NACRE 1999) */
+/* C13 + a -> n + O16 */    // NACRE 1999
     if(T9>4.)
     {
         f[97]= 7.59e6*pow(T9,1.078)*exp(-12.056/T9);
@@ -1626,9 +1390,9 @@ else
     // Contribution from thermal excited levels (NACRE 1999)
     f[97]*=(1.+7.3318e1*exp(-58.176/T9-1.98e-1*T9));
 	
-/* ####################### NEW REACTIONS ####################### */
+/* ####################### NEW REACTIONS ####################### */     // Inspired by Parthenope
 
-/* B11 + d -> p + B12 */ /* C.......B11(d,p)B12................(Iocco et al 2007) */
+/* B11 + d -> p + B12 */    // Iocco et al 2007
     f[98]=.60221*((4.97838e13*exp(-14.8348*pow(.0215424+1./T9,1./3.))*pow(.0215424+1./T9,1./6.)*pow(T9,-0.5))/
                   (46.42+T9)+exp(-14.835*pow(T9,-1./3.))*(6.52581e9+(1.56921e11-4.074e9*pow(T9,1./3.)+1.28302e9*T9)*
                                                           pow(T9,-2./3.)));
@@ -1640,7 +1404,7 @@ else
         ferr[98]=ferrlow[98];
     }
 
-/* C12 + d -> p + C13 */ /* C.......C12(d,p)C13................(Iocco et al 2007) */
+/* C12 + d -> p + C13 */    // Iocco et al 2007
     f[99]=6.60999e12*pow(T9,-2./3.)*exp(-16.8242*pow(T9,-1./3.)-.234041*pow(T9,2./3.))*
             (1.-exp(-1.10272*(1.+.921391*pow(T9,1./3.))*(1.+.921391*pow(T9,1./3.))));
 
@@ -1651,7 +1415,7 @@ else
         ferr[99]=ferrlow[99];
     }
 
-/* C13 + d -> p + C14 */ /* C.......C13(d,p)C14................(Iocco et al 2007) */
+/* C13 + d -> p + C14 */    // Iocco et al 2007
     f[100]=7.23773e12*pow(T9,-2./3.)*exp(-16.8869*pow(T9,-1./3.)-.242434*pow(T9,2./3.))*
             (1.-exp(-1.08715*(1.+.944456*pow(T9,1./3.))*(1.+.944456*pow(T9,1./3.))));
 

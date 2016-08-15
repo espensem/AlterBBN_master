@@ -119,11 +119,11 @@ double geff(double Temp, struct relicparam paramrelic)
 void Init_cosmomodel(struct relicparam* paramrelic)
 /* initializes the parameters contained in paramrelic */
 {
-    paramrelic->Tinit=27.;  /* Starting at Tnud=2.3 MeV as default */
-    paramrelic->eta0=6.10e-10; /* baryon-to-photon ratio from Planck 2015 results XIII (modified by Cyburt et al. "BBN: 2015" */
-    paramrelic->Nnu=3.046; /* number of SM neutrinos, e+- reheating included */
-    paramrelic->dNnu=0.;  /* extra neutrinos (e.g. sterile neutrinos) */
-    paramrelic->life_neutron=880.3; /* neutron lifetime PDG2014 */
+    paramrelic->Tinit=27.;          // Starting at Tnud=2.3 MeV as default
+    paramrelic->eta0=6.10e-10;      // Baryon-to-photon ratio (Planck 2015 results XIII)
+    paramrelic->Nnu=3.046;          // Number of SM neutrinos, e+- reheating included
+    paramrelic->dNnu=0.;            // Number of extra neutrino species (e.g. sterile neutrinos)
+    paramrelic->life_neutron=880.3; // Neutron lifetime (PDG2014)
     paramrelic->wimp_added=0;
     paramrelic->vary_phiW=0;
     paramrelic->xinu1=0.;
@@ -148,8 +148,8 @@ void Init_cosmomodel_param(double Tinit, double eta, double Nnu, double dNnu, do
     paramrelic->Nnu=Nnu;
     paramrelic->dNnu=dNnu;
 	paramrelic->life_neutron=life_neutron;
-	paramrelic->xinu1=xinu1;
-	paramrelic->xinu2=xinu2;
+    paramrelic->xinu1=xinu1;
+    paramrelic->xinu2=xinu2;
     paramrelic->xinu3=xinu3;
 	return;
 }
@@ -350,11 +350,11 @@ double nonthermal(double T, struct relicparam paramrelic)
 /*--------------------------------------------------------------*/
 
 double neutdens(double Tnu, struct relicparam paramrelic)
-/* computes the neutrino density in case of degeneracies at temperature Tnu */
+/* Computes the neutrino density, including any effects from a neutrino degeneracy */
 {
     if((paramrelic.xinu1==0.)&&(paramrelic.xinu2==0.)&&(paramrelic.xinu3==0.))
     {
-        /* Relativistic approximation */
+        /* No degeneracy, relativistic approximation */
         return 2.*pi*pi/30.*7./8.*paramrelic.Nnu*pow(Tnu,4.);
     }
 
@@ -420,9 +420,8 @@ double neutdens(double Tnu, struct relicparam paramrelic)
 /*--------------------------------------------------------------*/
 
 double neutdens_deriv(double Tnu, struct relicparam paramrelic)
-/* computes the temperature (Tnu) derivative of the neutrino energy density */
+/* Computes the temperature (Tnu) derivative of the neutrino energy density */
 {
-
     if((paramrelic.xinu1==0.)&&(paramrelic.xinu2==0.)&&(paramrelic.xinu3==0.))
     {
         return 7.*pi*pi/30.*paramrelic.Nnu*pow(Tnu,3.);
@@ -481,10 +480,7 @@ double neutdens_deriv(double Tnu, struct relicparam paramrelic)
         }
     }
     return drho;
-
 }
-
-
 
 
 
