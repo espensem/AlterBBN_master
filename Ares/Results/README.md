@@ -1,0 +1,1 @@
+Files with data written from inside AlterBBN are saved in this folder. Custom-made programs that calls on ARES may also be saved here.

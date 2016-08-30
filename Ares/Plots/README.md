@@ -1,0 +1,1 @@
+Plots made with ARES will be saved to this folder.
