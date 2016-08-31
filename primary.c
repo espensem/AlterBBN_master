@@ -17,6 +17,7 @@ typedef struct
     double phiW;
     int vary_phiW;
     double Tinit;
+    int plot_abundancesVStime, plot_NeffVSmassWIMP;
 } configuration;
 
 
@@ -27,49 +28,63 @@ static int handler(void* user, const char* section, const char* name,
 
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
       if (MATCH("parameter", "eta")) {
-        pconfig->eta = atof(value);
+          pconfig->eta = atof(value);
     } else if (MATCH("parameter", "nnu")) {
-        pconfig->Nnu = atof(value);
+          pconfig->Nnu = atof(value);
     } else if (MATCH("parameter", "dnnu")) {
-        pconfig->dNnu = atof(value);
+          pconfig->dNnu = atof(value);
     } else if (MATCH("parameter", "tau")) {
-        pconfig->tau = atof(value);
+          pconfig->tau = atof(value);
     } else if (MATCH("parameter", "xi_1")) {
-        pconfig->xinu1 = atof(value);
+          pconfig->xinu1 = atof(value);
     } else if (MATCH("parameter", "xi_2")) {
-        pconfig->xinu2 = atof(value);
+          pconfig->xinu2 = atof(value);
     } else if (MATCH("parameter", "xi_3")) {
-        pconfig->xinu3 = atof(value);
+          pconfig->xinu3 = atof(value);
     } else if (MATCH("parameter", "dd0")) {
-        pconfig->dd0 = atof(value);
+          pconfig->dd0 = atof(value);
     } else if (MATCH("parameter", "ndd")) {
-        pconfig->ndd = atof(value);
+          pconfig->ndd = atof(value);
     } else if (MATCH("parameter", "sd0")) {
-        pconfig->sd0 = atof(value);
+          pconfig->sd0 = atof(value);
     } else if (MATCH("parameter", "nsd")) {
-        pconfig->nsd = atof(value);
+          pconfig->nsd = atof(value);
     } else if (MATCH("parameter", "Tdend")) {
-        pconfig->Tdend = atof(value);
+          pconfig->Tdend = atof(value);
     } else if (MATCH("parameter", "Tsend")) {
-        pconfig->Tsend = atof(value);
+          pconfig->Tsend = atof(value);
     } else if (MATCH("parameter", "Sigmad0")) {
-        pconfig->Sigmad0 = atof(value);
+          pconfig->Sigmad0 = atof(value);
     } else if (MATCH("parameter", "nSigmad")) {
-        pconfig->nSigmad = atof(value);
+          pconfig->nSigmad = atof(value);
     } else if (MATCH("parameter", "TSigmaend")) {
-        pconfig->TSigmaend = atof(value);
+          pconfig->TSigmaend = atof(value);
     } else if (MATCH("parameter", "mass_wimp")) {
-        pconfig->mass_wimp = atof(value);
+          pconfig->mass_wimp = atof(value);
     } else if (MATCH("parameter", "type_wimp")) {
-        pconfig->type_wimp = atoi(value);
+          pconfig->type_wimp = atoi(value);
     } else if (MATCH("parameter", "coupling")) {
-        pconfig->coupling = atoi(value);
+          pconfig->coupling = atoi(value);
     } else if (MATCH("parameter", "phiW")) {
-        pconfig->phiW = atof(value);
+          pconfig->phiW = atof(value);
     } else if (MATCH("parameter", "vary_phiW")) {
-        pconfig->vary_phiW = atoi(value);
+          pconfig->vary_phiW = atoi(value);
     } else if (MATCH("parameter", "T9i")) {
-        pconfig->Tinit = atof(value);
+          pconfig->Tinit = atof(value);
+    } else if (MATCH("parameter", "abundancesVStime")) {
+          pconfig->plot_abundancesVStime = atoi(value);
+          if (!( (atoi(value) == 0) || (atoi(value) == 1) )) {
+              printf("\t [WARNING] Invalid argument in 'input.ini': 'abundancesVStime' must be\n"
+                     "\t           0 (false) or 1 (true). Default value 0 used.\n\n");
+              pconfig->plot_abundancesVStime = 0;
+          }
+    } else if (MATCH("parameter", "NeffVSmassWIMP")) {
+          pconfig->plot_NeffVSmassWIMP = atoi(value);
+          if (!( (atoi(value) == 0) || (atoi(value) == 1) )) {
+              printf("\t [WARNING] Invalid argument in 'input.ini': 'NeffVsmassWIMP' must be\n"
+                     "\t           0 (false) or 1 (true). Default value 0 used.\n\n");
+              pconfig->plot_NeffVSmassWIMP = 0;
+          }
     } else {
         return 0;  /* unknown section/name, error */
     }
@@ -89,6 +104,7 @@ int main(int argc,char** argv)
     const char *const darkdens = "darkdens";
     const char *const reheating = "reheating";
     const char *const wimp = "wimp";
+    //const char *const combine = "combine";
 
     /* The type of run may be stated as an input argument. An empty argument will run
      * the default parameter-free SBBN with eta_10=6.10, tau=880.3 and Nnu=3.046. */
@@ -100,6 +116,7 @@ int main(int argc,char** argv)
         else if (strcmp(darkdens, &cosmoType) == 0) cosmo = 2;
         else if (strcmp(reheating, &cosmoType) == 0) cosmo = 3;
         else if (strcmp(wimp, &cosmoType) == 0) cosmo = 4;
+        //else if (strcmp(combine, &cosmoType) == 0) cosmo = 5;
         else
         {
             printf("\t [ERROR]  Wrong argument. Must be 'standard', 'darkdens', 'reheating' or 'wimp'\n");
@@ -109,10 +126,18 @@ int main(int argc,char** argv)
     else if (argc>2)
     {
         printf("\t This program takes maximum 1 input parameter: type of cosmology.\n"
-               "\t Must be 'standard', 'darkdens', 'reheating', or 'wimp'\n");
+               "\t Must be 'standard', 'darkdens', 'reheating' or 'wimp'\n");
         exit(1);
     }
-
+    /*
+    char cwd[1024];
+       if (getcwd(cwd, sizeof(cwd)) != NULL)
+           fprintf(stdout, "Current working dir: %s\n", cwd);
+       else
+           perror("getcwd() error");
+       return 0;
+    exit(1);
+    */
     // Parsing the input file, storing it in 'config' structure
     configuration config;
 
@@ -127,24 +152,24 @@ int main(int argc,char** argv)
     // If other than default SBBN scenario is chosen, initialize parameters as given through "input.ini".
     if (cosmo == 1)            // standard cosmology
     {
-        //printf("STANDARD\n");
-        Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,config.xinu3,&paramrelic);
+        Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,
+                              config.xinu3,config.plot_abundancesVStime, config.plot_NeffVSmassWIMP,&paramrelic);
     }
     else if (cosmo == 2)       // dark density included
     {
-        //printf("DARKDENS\n");
-        Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,config.xinu3,&paramrelic);
+        Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,
+                              config.xinu3,config.plot_abundancesVStime, config.plot_NeffVSmassWIMP,&paramrelic);
         Init_dark_density(config.dd0,config.ndd,config.Tdend,&paramrelic);
         Init_dark_entropy(config.sd0,config.nsd,config.Tsend,&paramrelic);
     }
     else if (cosmo == 3)      // reheating included
     {
-        //printf("REHEATING\n");
-        Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,config.xinu3,&paramrelic);
+        Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,
+                              config.xinu3,config.plot_abundancesVStime, config.plot_NeffVSmassWIMP,&paramrelic);
         Init_dark_density(config.dd0,config.ndd,config.TSigmaend,&paramrelic);
         Init_dark_entropySigmaD(config.Sigmad0,config.nSigmad,config.TSigmaend,&paramrelic);
     }
-    else if (cosmo == 4)           // WIMP included
+    else if (cosmo == 4)          // WIMP included
     {
         double gchi, gchi_t;
         int fermion, selfConjugate; // 1/0 for fermion/boson, 1/0 for self-conjugate/non-self-conjugate
@@ -181,11 +206,20 @@ int main(int argc,char** argv)
             printf("\t [ERROR] Incorrect input value for parameter 'type_wimp'.");
             exit(1);
         }
-        Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,config.xinu3,&paramrelic);
-        Init_wimp(config.mass_wimp,gchi,gchi_t,fermion,config.coupling,config.phiW,config.vary_phiW,selfConjugate,&paramrelic);
-        Init_dark_density(config.dd0,config.ndd,config.Tdend,&paramrelic);
-        Init_dark_entropy(config.sd0,config.nsd,config.Tsend,&paramrelic);
-        Init_dark_entropySigmaD(config.Sigmad0,config.nSigmad,config.TSigmaend,&paramrelic);
+        Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,
+                              config.xinu3,config.plot_abundancesVStime, config.plot_NeffVSmassWIMP,&paramrelic);
+        Init_wimp(config.mass_wimp,gchi,gchi_t,fermion,config.coupling,config.phiW,config.vary_phiW,selfConjugate,
+                  &paramrelic);
+        /*
+        if (cosmo == 5) {
+            Init_dark_density(config.dd0,config.ndd,config.Tdend,&paramrelic);
+            Init_dark_entropy(config.sd0,config.nsd,config.Tsend,&paramrelic);
+            Init_dark_entropySigmaD(config.Sigmad0,config.nSigmad,config.TSigmaend,&paramrelic);
+        }
+        */
+    }
+    else {
+        // Cosmo = 0. Parameter-free SBBN. Do nothing.
     }
 
     //OUTPUT
