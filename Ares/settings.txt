@@ -1,0 +1,52 @@
+
+User defined settings for ARES. DO NOT change any of the parameter names. These are 
+used to collect the value in the function CollectData in ares.py.
+
+
+############## GENERAL SETTINGS ##############
+# The program to be run and compiled. Not a command line input option.
+# Allowed arguments: full path to main program
+1) program = primary.c
+
+# Execute AlterBBN once (single) or multiple times (multi).
+# Allowed arguments: "single", "multi"
+2) runType = single     
+
+# Type of cosmology to be analyzed by AlterBBN.
+# Allowed arguments: "paramfree", "standard", "darkdens", "reheating", "wimp"
+3) cosmoType = standard	
+
+# Direct the results to 'alterdata.txt' (True), or print them to the terminal (False) for 
+# singlerun. Results are automatically directed to 'alterdata.txt' for multirun.
+# Allowed arguments: "True", "False"
+4) direct_output = False	
+
+# Switch to override all plot settings for simplicity. 
+# Allowed arguments: "True" for plot none, "False" for setting plots individually
+5.1) plot_none = False
+	
+# Switch to enable plot of abundances as a function of eta (enabled only if varyParam is eta)
+# Allowed arguments: "True", "False"
+5.2) plot_abundancesVSeta = True
+
+############## MULTIRUN SETTINGS ###############
+# Parameter to vary in multirun
+# Allowed arguments: "eta", "dnnu", "tau", "xinu1", "xinu2", "xinu3", "mass_wimp", "phiW"
+6) varyParam = eta
+
+# Lower value limit of varyParam
+# Allowed arguments: Any positive float
+7) lowVal = 1e-10
+
+# Higher value limit of varyParam
+# Allowed arguments: Any positive float
+8) highVal = 1e-9
+
+# Number of values to analyze between lowVal and highVal
+# Allowed arguments: any positive integer
+9) nVals = 3
+
+# Type of spacing between the values to analyze
+# Allowed arguments: "log", "normal"
+10) spacingType = log
+

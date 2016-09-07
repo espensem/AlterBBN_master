@@ -40,7 +40,7 @@ class Ares():
     * to outputfile "alterdata.txt", False if output should be printed to the terminal.
     '''
     def __init__(self, param="eta", program="primary.c", cosmoType="paramfree", singlerun=True,
-                 direct_output=False, plot_none=False):
+                 direct_output=False, plot_abundancesVSeta=False, plot_none=False):
 
         # Cross-platform path directories
         self.aresPath = os.path.dirname(__file__)      			# Current directory
@@ -64,12 +64,19 @@ class Ares():
         # Dictionary holding all element objects
         self.elements = {}
         # Plotting switches, defaults to False for all
-        self.plot_abundancesVSeta = False
+        self.plot_abundancesVSeta = plot_abundancesVSeta
         self.plot_abundancesVStime = False
         self.plot_NeffVSmassWIMP = False
         # Switch to override all plot settings given in AlterBBN inputfile, and unable all.
         self.plot_none = plot_none
 
+        '''
+        print self.aresPath
+        print self.alterPath
+        print self.program
+        print self.executable
+        sys.exit()
+        '''
 
 
 
@@ -93,7 +100,6 @@ class Ares():
 
 
 
-
     '''
     * Method for compiling and executing AlterBBN, given the default/user defined settings
     * and arguments.
@@ -111,7 +117,7 @@ class Ares():
             print "\t [INFO]   Running Ares with the settings:\n"+\
                 "\t          runType=multi, cosmoType=%s, varyParam=%s," \
                 % (self.cosmoType, self.param)
-            print "\t          lowVal=%.3e, highVal=%.3e, N=%d, spacingType=%s.\n" \
+            print "\t          lowVal=%.3e, highVal=%.3e, nVals=%d, spacingType=%s.\n" \
                 % (self.x[0], self.x[-1], len(self.x), self.spacingType)
 
         t0 = time.time()
@@ -145,7 +151,7 @@ class Ares():
                     if self.cosmoType == "paramfree":
                         try:
                             frameinfo = getframeinfo(currentframe())
-                            subprocess.call([self.executable], stdout=out)
+                            subprocess.call(["./"+self.executable], stdout=out)
                         except Exception as e:
                             print frameinfo.filename, frameinfo.lineno+1
                             print "\t [ERROR]  Could not run '%s'." % (os.path.
@@ -159,7 +165,7 @@ class Ares():
                     else:
                         try:
                             frameinfo = getframeinfo(currentframe())
-                            subprocess.call([self.executable, self.cosmoType], stdout=out)
+                            subprocess.call(["./"+self.executable, self.cosmoType], stdout=out)
                         except Exception as e:
                             print frameinfo.filename, frameinfo.lineno+1
                             print "\t [ERROR]  Could not run '%s'." % (os.path.
@@ -176,7 +182,7 @@ class Ares():
                 if self.cosmoType == "paramfree":
                     try:
                         frameinfo = getframeinfo(currentframe())
-                        subprocess.call([self.executable])
+                        subprocess.call(["./"+self.executable])
                     except Exception as e:
                         print frameinfo.filename, frameinfo.lineno+1
                         print "\t [ERROR]  Could not run '%s'." % (os.path.
@@ -188,7 +194,7 @@ class Ares():
                 else:
                     try:
                         frameinfo = getframeinfo(currentframe())
-                        subprocess.call([self.executable, self.cosmoType])
+                        subprocess.call(["./"+self.executable, self.cosmoType])
                     except Exception as e:
                         print frameinfo.filename, frameinfo.lineno+1
                         print "\t [ERROR]  Could not run '%s'." % (os.path.
@@ -229,7 +235,7 @@ class Ares():
                 # Execute the program, direct output to self.outfile
                 outapp = open(self.outfile, 'a')
                 with outapp as out:
-                    subprocess.call([self.executable, self.cosmoType], stdout=out)
+                    subprocess.call(["./"+self.executable, self.cosmoType], stdout=out)
             outapp.close()
             # Change working directory back to Ares directory
             os.chdir(self.aresPath)

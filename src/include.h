@@ -98,12 +98,14 @@ double heff(double Temp, struct relicparam paramrelic);
 double sgStar(double Temp, struct relicparam paramrelic);
 double geff(double Temp, struct relicparam paramrelic);
 void Init_cosmomodel(struct relicparam* paramrelic);
-void Init_cosmomodel_param(double Tinit, double eta, double Nnu, double dNnu, double life_neutron, double xinu1, double xinu2, double xinu3, struct relicparam* paramrelic);
+void Init_cosmomodel_param(double Tinit, double eta, double Nnu, double dNnu, double life_neutron, double xinu1,
+                           double xinu2, double xinu3, struct relicparam* paramrelic);
 void Init_dark_density(double dd0, double ndd, double T_end, struct relicparam* paramrelic);
 void Init_dark_entropy(double sd0, double nsd, double T_end, struct relicparam* paramrelic);
 void Init_dark_entropySigmaD(double Sigmad0, double nSigmad, double T_end, struct relicparam* paramrelic);
 void Init_nonthermal(double nt0, double nnt, double T_end, struct relicparam* paramrelic);
-void Init_wimp(double mass_wimp, double g_chi, double g_chi_tilde, int beta, int SM_coupling_wimp, double phiW, int vary_phiW, int selfConjugate, struct relicparam* paramrelic);
+void Init_wimp(double mass_wimp, double g_chi, double g_chi_tilde, int beta, int SM_coupling_wimp, double phiW,
+               int vary_phiW, int selfConjugate, struct relicparam* paramrelic);
 double dark_density(double T, struct relicparam paramrelic);
 double dark_entropy(double T, struct relicparam paramrelic);
 double dark_entropy_derivative(double T, struct relicparam paramrelic);

@@ -17,7 +17,6 @@ typedef struct
     double phiW;
     int vary_phiW;
     double Tinit;
-    int plot_abundancesVStime, plot_NeffVSmassWIMP;
 } configuration;
 
 
@@ -71,20 +70,6 @@ static int handler(void* user, const char* section, const char* name,
           pconfig->vary_phiW = atoi(value);
     } else if (MATCH("parameter", "T9i")) {
           pconfig->Tinit = atof(value);
-    } else if (MATCH("parameter", "abundancesVStime")) {
-          pconfig->plot_abundancesVStime = atoi(value);
-          if (!( (atoi(value) == 0) || (atoi(value) == 1) )) {
-              printf("\t [WARNING] Invalid argument in 'input.ini': 'abundancesVStime' must be\n"
-                     "\t           0 (false) or 1 (true). Default value 0 used.\n\n");
-              pconfig->plot_abundancesVStime = 0;
-          }
-    } else if (MATCH("parameter", "NeffVSmassWIMP")) {
-          pconfig->plot_NeffVSmassWIMP = atoi(value);
-          if (!( (atoi(value) == 0) || (atoi(value) == 1) )) {
-              printf("\t [WARNING] Invalid argument in 'input.ini': 'NeffVsmassWIMP' must be\n"
-                     "\t           0 (false) or 1 (true). Default value 0 used.\n\n");
-              pconfig->plot_NeffVSmassWIMP = 0;
-          }
     } else {
         return 0;  /* unknown section/name, error */
     }
@@ -153,19 +138,19 @@ int main(int argc,char** argv)
     if (cosmo == 1)            // standard cosmology
     {
         Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,
-                              config.xinu3,config.plot_abundancesVStime, config.plot_NeffVSmassWIMP,&paramrelic);
+                              config.xinu3,&paramrelic);
     }
     else if (cosmo == 2)       // dark density included
     {
         Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,
-                              config.xinu3,config.plot_abundancesVStime, config.plot_NeffVSmassWIMP,&paramrelic);
+                              config.xinu3,&paramrelic);
         Init_dark_density(config.dd0,config.ndd,config.Tdend,&paramrelic);
         Init_dark_entropy(config.sd0,config.nsd,config.Tsend,&paramrelic);
     }
     else if (cosmo == 3)      // reheating included
     {
         Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,
-                              config.xinu3,config.plot_abundancesVStime, config.plot_NeffVSmassWIMP,&paramrelic);
+                              config.xinu3,&paramrelic);
         Init_dark_density(config.dd0,config.ndd,config.TSigmaend,&paramrelic);
         Init_dark_entropySigmaD(config.Sigmad0,config.nSigmad,config.TSigmaend,&paramrelic);
     }
@@ -207,7 +192,7 @@ int main(int argc,char** argv)
             exit(1);
         }
         Init_cosmomodel_param(config.Tinit,config.eta,config.Nnu,config.dNnu,config.tau,config.xinu1,config.xinu2,
-                              config.xinu3,config.plot_abundancesVStime, config.plot_NeffVSmassWIMP,&paramrelic);
+                              config.xinu3,&paramrelic);
         Init_wimp(config.mass_wimp,gchi,gchi_t,fermion,config.coupling,config.phiW,config.vary_phiW,selfConjugate,
                   &paramrelic);
         /*
